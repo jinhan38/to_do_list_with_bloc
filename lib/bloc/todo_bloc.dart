@@ -23,10 +23,8 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Stream<TodoState> _mapListTodoEvent(ListTodosEvent event) async* {
     try {
       yield Loading();
-
       final resp = await this.todoRepository.listTodo();
       final todos = resp.map<Todo>((e) => Todo.fromJson(e)).toList();
-
       yield Loaded(todos: todos);
     } catch (e) {
       yield Error(message: e.toString());
@@ -36,11 +34,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Stream<TodoState> _mapCreateTodoEvent(CreateTodoEvent data) async* {
     //yield된 것들은 bloc의 state에 저장된다.
     try {
-
       //중요
       //await this.todoRepository.createTodo(newTodo)를 이용해서 repository를 호출하면 1초의 딜레이를 설정해놨다.
       //하지만 여기서 repository.createTodo를 호출하기 전에 미리 ui를 그렸기 때문에 실제 앱에서 delay가 발생하지 않는다.
-
 
       if (state is Loaded) {
         final parsedState = (state as Loaded);
@@ -76,10 +72,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Stream<TodoState> _mapDeleteTodoEvent(DeleteTodoEvent data) async* {
     //yield된 것들은 bloc의 state에 저장된다.
     try {
-
       if (state is Loaded) {
-        final newTodo =
-            (state as Loaded).todos.where((todo) => todo.id != data.todo.id).toList();
+        final newTodo = (state as Loaded)
+            .todos
+            .where((todo) => todo.id != data.todo.id)
+            .toList();
 
         yield Loaded(todos: newTodo);
 

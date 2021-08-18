@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_list_with_bloc/bloc/todo_bloc.dart';
+import 'package:to_do_list_with_bloc/bloc/todo_cubit.dart';
 import 'package:to_do_list_with_bloc/bloc/todo_event.dart';
 import 'package:to_do_list_with_bloc/bloc/todo_state.dart';
 import 'package:to_do_list_with_bloc/repository/todo_repository.dart';
@@ -12,11 +13,23 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+///bloc
+// class _HomeScreenState extends State<HomeScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocProvider(
+//       create: (_) => TodoBloc(todoRepository: TodoRepository()),
+//       child: HomeWidget(),
+//     );
+//   }
+// }
+
+///cubit
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => TodoBloc(todoRepository: TodoRepository()),
+      create: (_) => TodoCubit(repository: TodoRepository()),
       child: HomeWidget(),
     );
   }
@@ -35,7 +48,12 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<TodoBloc>(context).add(ListTodosEvent());
+
+    //Bloc
+    // BlocProvider.of<TodoBloc>(context).add(ListTodosEvent());
+
+    //Cubit
+    BlocProvider.of<TodoCubit>(context).listTodo();
   }
 
   @override
@@ -46,8 +64,12 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //BlocProvider.of<TodoBloc>(context).add(ListTodosEvent()); 와 같은 문법
-          context.read<TodoBloc>().add(CreateTodoEvent(title: this.title));
+          //Bloc
+          //// BlocProvider.of<TodoBloc>(context).add(ListTodosEvent()); 와 같은 문법
+          // context.read<TodoBloc>().add(CreateTodoEvent(title: this.title));
+
+          //Cubit
+          context.read<TodoCubit>().createTodo(this.title);
         },
         child: Icon(Icons.edit),
       ),
@@ -63,7 +85,11 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
           SizedBox(height: 16),
           Expanded(
-            child: BlocBuilder<TodoBloc, TodoState>(builder: (_, state) {
+            //Bloc
+            // child: BlocBuilder<TodoBloc, TodoState>(builder: (_, state) {
+
+            //Cubit
+            child: BlocBuilder<TodoCubit, TodoState>(builder: (_, state) {
               if (state is Empty) {
                 return Container();
               } else if (state is Error) {
@@ -84,8 +110,14 @@ class _HomeWidgetState extends State<HomeWidget> {
                             GestureDetector(
                               child: Icon(Icons.delete),
                               onTap: () {
-                                BlocProvider.of<TodoBloc>(context)
-                                    .add(DeleteTodoEvent(todo: item));
+
+                                //Bloc
+                                // BlocProvider.of<TodoBloc>(context)
+                                //     .add(DeleteTodoEvent(todo: item));
+
+                                //Cubit
+                                BlocProvider.of<TodoCubit>(context)
+                                    .deleteTodo(item);
                               },
                             )
                           ],

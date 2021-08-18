@@ -5,26 +5,33 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:to_do_list_with_bloc/main.dart';
+void main() async {
+  //Stream<int>를 반환하는 countStream의 작업을 변수 stream에 담았다.
+  //이때 countStream 함수의 작업을 실시하지 않는다.
+  //countStream 함수의 작업은 await sumStream(stream) 호출 시 진행된다.
+  //stream은 lazy 초기화와 유사한 개념이다.
+  //사용할 때 작업을 실시한다.
+  var stream = countStream(10);
+  // stream.listen((event) => print("stream listener : $event"));
+  var sum = await sumStream(stream);
+  print("result sum : $sum");
+}
 
-void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+Stream<int> countStream(int to) async* {
+  for (int i = 0; i <= to; i++) {
+    await Future.delayed(const Duration(seconds: 1));
+    print("countStream i: $i");
+    yield i;
+  }
+}
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+Future<int> sumStream(Stream<int> stream) async {
+  var sum = 0;
+  await for (var value in stream) {
+    sum += value;
+    print("sumStream sum : $sum");
+  }
+  return sum;
 }

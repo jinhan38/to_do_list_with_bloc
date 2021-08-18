@@ -27,3 +27,4 @@ class DeleteTodoEvent extends TodoEvent {
   @override
   List<Object?> get props => [this.todo];
 }
+
